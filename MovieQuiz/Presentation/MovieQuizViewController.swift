@@ -59,7 +59,7 @@ final class MovieQuizViewController: UIViewController {
         super.viewDidLoad()
         
         imageView.layer.masksToBounds = true
-        imageView.layer.cornerRadius = 6
+        imageView.layer.cornerRadius = 20
         
         show(quiz: convert(model: questions[0]))
     }
