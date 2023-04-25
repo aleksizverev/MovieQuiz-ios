@@ -5,6 +5,9 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
+    @IBOutlet private var yesButton: UIButton!
+    @IBOutlet private var noButton: UIButton!
+    
     
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
@@ -54,6 +57,10 @@ final class MovieQuizViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = 6
+        
         show(quiz: convert(model: questions[0]))
     }
     
@@ -90,33 +97,38 @@ final class MovieQuizViewController: UIViewController {
     }
     
     private func showNextQuestionOrResults() {
+        
+        imageView.layer.borderWidth = 0
+
         if currentQuestionIndex == questions.count - 1 {
             quizesPlayed += 1
-            let results = "Your result: \(correctAnswers)/10"
+            let results = "Ваш результат: \(correctAnswers)/10"
             let ResultViewModel = QuizResultsViewModel(
-                title: "Round is over!",
+                title: "Этот раунд окончен!",
                 text: results,
-                buttonText: "Play again")
-            
+                buttonText: "Сыграть еще раз")
             show(quiz: ResultViewModel)
         } else {
             currentQuestionIndex += 1
-            
             show(quiz: convert(model: questions[currentQuestionIndex]))
         }
     }
      
     private func showAnswerResult(isCorrect: Bool) {
+        noButton.isEnabled = false
+        yesButton.isEnabled = false
+        
         if isCorrect {
             correctAnswers += 1
         }
         
-        imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-            
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showNextQuestionOrResults()
+            self.noButton.isEnabled = true
+            self.yesButton.isEnabled = true
         }
     }
     
