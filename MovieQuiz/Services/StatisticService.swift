@@ -1,10 +1,25 @@
 import Foundation
 
-final class StatisticServiceImplementation: StatisticService {
+final class StatisticServiceImplementation: StatisticServiceProtocol {
     
     private let userDefaults = UserDefaults.standard
     private enum Keys: String {
         case correct, total, bestGame, gamesCount
+    }
+    
+    var correctAnswer: Int {
+        get { userDefaults.integer(forKey: Keys.correct.rawValue) }
+        set { userDefaults.set(newValue, forKey: Keys.correct.rawValue) }
+    }
+    
+    var totalAnswers: Int {
+        get { userDefaults.integer(forKey: Keys.total.rawValue) }
+        set { userDefaults.set(newValue, forKey: Keys.total.rawValue) }
+    }
+    
+    var gamesCount: Int {
+        get { userDefaults.integer(forKey: Keys.gamesCount.rawValue) }
+        set { userDefaults.set(newValue, forKey: Keys.gamesCount.rawValue)}
     }
     
     var totalAccuracy: Double {
@@ -13,11 +28,6 @@ final class StatisticServiceImplementation: StatisticService {
             let totalAnswers = userDefaults.double(forKey: Keys.total.rawValue)
             return Double(correctAnswers/totalAnswers*100)
         }
-    }
-    
-    var gamesCount: Int {
-        get { userDefaults.integer(forKey: Keys.gamesCount.rawValue) }
-        set { userDefaults.set(newValue, forKey: Keys.gamesCount.rawValue)}
     }
     
     var bestGame: GameRecord {
@@ -40,15 +50,11 @@ final class StatisticServiceImplementation: StatisticService {
     
     func store(correct count: Int, total amount: Int) {
         let otherGame = GameRecord(correct: count, total: amount, date: Date())
-        if bestGame.hasLessCorrectAnswers(than: otherGame){
+        if bestGame < otherGame{
             self.bestGame = otherGame
         }
         gamesCount += 1
-        
-        let correctAnswers = userDefaults.integer(forKey: Keys.correct.rawValue) + count
-        let totalAnswers = userDefaults.integer(forKey: Keys.total.rawValue) + amount
-        
-        userDefaults.set(correctAnswers, forKey: Keys.correct.rawValue)
-        userDefaults.set(totalAnswers, forKey: Keys.total.rawValue)
+        correctAnswer += count
+        totalAnswers += amount
     }
 }
