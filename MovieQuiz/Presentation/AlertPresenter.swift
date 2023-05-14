@@ -1,7 +1,7 @@
 import UIKit
 
-class ResultAlertPresenter{
-    func showAlert(controller: UIViewController, alertModel: AlertModel) {
+class AlertPresenter{
+    func showAlert(on controller: UIViewController, with alertModel: AlertModel) {
         let alert = UIAlertController(
             title: alertModel.title,
             message: alertModel.message,
