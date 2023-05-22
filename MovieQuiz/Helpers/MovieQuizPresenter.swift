@@ -2,9 +2,7 @@ import Foundation
 import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
-
     let questionsAmount: Int = 10
-    
     private var currentQuestionIndex: Int = 0
     private var currentQuestion: QuizQuestion?
     private var quizesPlayed = 0
@@ -32,6 +30,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     func restartGame() {
         currentQuestionIndex = 0
         correctAnswers = 0
+        questionFactory?.loadData()
     }
     
     func switchToNextQuestion() {
@@ -64,12 +63,50 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-//    func didReceiveNextQuestion(question: QuizQuestion?) {
-//        didReceiveNextQuestion(question: question)
-//    }
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+            return
+        }
+        
+        setCurrentQuestion(to: question)
+        let viewModel = convert(model: question)
+        DispatchQueue.main.async { [weak self] in
+            self?.viewController?.show(quiz: viewModel)
+        }
+        viewController?.enableAnswerButtons()
+    }
     
-    func showNextQuestionOrResults() {
-        viewController?.imageView.layer.borderWidth = 0
+    func didAnswer(isCorrectAnswer: Bool) {
+        if isCorrectAnswer {
+            correctAnswers += 1
+        }
+    }
+    
+    private func didAnswer(isYes: Bool) {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        
+        let givenAnswer = isYes
+        
+        proceedWithAnswer(isCorrect: currentQuestion.correctAnswer == givenAnswer)
+    }
+    
+    func proceedWithAnswer(isCorrect: Bool) {
+        viewController?.disableAnswerButtons()
+        didAnswer(isCorrectAnswer: isCorrect)
+        
+        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            
+            proceedToNextQuestionOrResults()
+        }
+    }
+    
+    func proceedToNextQuestionOrResults() {
+        viewController?.disableImageBorder()
         if self.isLastQuestion() {
             quizesPlayed += 1
             
@@ -104,26 +141,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-    func didAnswer(isCorrectAnswer: Bool) {
-        if isCorrectAnswer {
-            correctAnswers += 1
-        }
-    }
-    
-    func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question = question else {
-            return
-        }
-        
-        setCurrentQuestion(to: question)
-        let viewModel = convert(model: question)
-        DispatchQueue.main.async { [weak self] in
-            self?.viewController?.show(quiz: viewModel)
-        }
-        viewController?.noButton.isEnabled = true
-        viewController?.yesButton.isEnabled = true
-    }
-    
     func convert(model: QuizQuestion) -> QuizStepViewModel {
         return QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
@@ -137,15 +154,5 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func noButtonClicked() {
         didAnswer(isYes: false)
-    }
-    
-    private func didAnswer(isYes: Bool) {
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        
-        let givenAnswer = isYes
-        
-        viewController?.showAnswerResult(isCorrect: currentQuestion.correctAnswer == givenAnswer)
     }
 }
