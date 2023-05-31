@@ -23,7 +23,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController.showLoadingIndicator()
     }
     
-    func isLastQuestion() -> Bool {
+    private func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
     }
     
@@ -33,15 +33,15 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         questionFactory?.loadData()
     }
     
-    func switchToNextQuestion() {
+    private func switchToNextQuestion() {
         currentQuestionIndex += 1
     }
     
-    func setCurrentQuestion(to question: QuizQuestion){
+    private func setCurrentQuestion(to question: QuizQuestion){
         currentQuestion = question
     }
     
-    func getCurrentQuestion() -> QuizQuestion? {
+    private func getCurrentQuestion() -> QuizQuestion? {
         return currentQuestion
     }
     
@@ -76,7 +76,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         viewController?.enableAnswerButtons()
     }
     
-    func didAnswer(isCorrectAnswer: Bool) {
+    private func didAnswer(isCorrectAnswer: Bool) {
         if isCorrectAnswer {
             correctAnswers += 1
         }
@@ -92,7 +92,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         proceedWithAnswer(isCorrect: currentQuestion.correctAnswer == givenAnswer)
     }
     
-    func proceedWithAnswer(isCorrect: Bool) {
+    private func proceedWithAnswer(isCorrect: Bool) {
         viewController?.disableAnswerButtons()
         didAnswer(isCorrectAnswer: isCorrect)
         
@@ -105,7 +105,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-    func proceedToNextQuestionOrResults() {
+    private func proceedToNextQuestionOrResults() {
         viewController?.disableImageBorder()
         if self.isLastQuestion() {
             quizesPlayed += 1
